@@ -3,9 +3,8 @@ chcp 65001 > nul
 title Agente IA + Chatbot WhatsApp
 echo.
 echo ================================================
-echo   AGENTE DE IA + CHATBOT WHATSAPP
-echo   Desenvolvedora Samara - TSG Solucoes Digitais
-echo   tsgsites.com.br ^| conexao.tsgsites.com.br
+echo   Q1 DIGITAL - ASSISTENTE DE IA WHATSAPP
+echo   Desenvolvido por Marcio
 echo ================================================
 echo.
 

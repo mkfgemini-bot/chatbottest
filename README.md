@@ -74,4 +74,4 @@ O WhatsApp Web precisa de um servidor rodando 24h com Chromium — por isso usam
 
 ---
 
-Projeto desenvolvido para a **Q1 Digital** · contato@q1digital.com.br · https://q1digital.com.br
+Projeto desenvolvido para a **Q1 Digital** por Márcio · contato@q1digital.com.br · https://q1digital.com.br
