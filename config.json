@@ -1,0 +1,49 @@
+{
+  "groqApiKey": "",
+  "useAI": true,
+  "model": "llama-3.1-8b-instant",
+  "promptSistema": "Você é o assistente virtual da empresa. Seja simpático, profissional e objetivo. Responda dúvidas sobre horário, preços e serviços. Se não souber algo, peça para a pessoa aguardar que um atendente responderá.",
+  "flows": [
+    {
+      "id": "1",
+      "palavras": [
+        "oi",
+        "olá",
+        "ola",
+        "bom dia",
+        "boa tarde",
+        "boa noite",
+        "menu"
+      ],
+      "resposta": "Olá! 👋 Sou o assistente virtual.\n\nComo posso ajudar?\n\n1 - Saber mais sobre nós\n2 - Falar com atendente\n3 - Horário de funcionamento\n\nDigite o número ou faça sua pergunta!"
+    },
+    {
+      "id": "2",
+      "palavras": [
+        "1",
+        "saber mais",
+        "como funciona"
+      ],
+      "resposta": "Atendimento disponível! Envie sua dúvida que eu te ajudo ou repasso para um atendente."
+    },
+    {
+      "id": "3",
+      "palavras": [
+        "2",
+        "atendente",
+        "humano"
+      ],
+      "resposta": "Um atendente humano entrará em contato em breve. Por favor, aguarde."
+    },
+    {
+      "id": "4",
+      "palavras": [
+        "3",
+        "horário",
+        "horario",
+        "funcionamento"
+      ],
+      "resposta": "Consulte nosso horário de atendimento. (Edite esta resposta na aba Fluxos com o horário da sua empresa)"
+    }
+  ]
+}

@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Q1 Digital · Painel do Assistente de IA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #05060a;
+      --bg-2: #0a0d16;
+      --surface: rgba(255,255,255,0.04);
+      --surface-2: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.09);
+      --border-glow: rgba(99,102,241,0.4);
+      --txt: #e8eaf2;
+      --txt-dim: #8b90a6;
+      --brand: #6366f1;
+      --brand-2: #06b6d4;
+      --accent: #22d3ee;
+      --green: #22c55e;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      color: var(--txt);
+      position: relative;
+      overflow-x: hidden;
+    }
+    /* Fundo animado ultramoderno */
+    .bg-grid {
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(99,102,241,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99,102,241,0.06) 1px, transparent 1px);
+      background-size: 46px 46px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+    }
+    .glow {
+      position: fixed; z-index: 0; border-radius: 50%;
+      filter: blur(120px); opacity: 0.5; pointer-events: none;
+    }
+    .glow.a { top: -180px; left: -120px; width: 480px; height: 480px; background: #4f46e5; animation: float1 14s ease-in-out infinite; }
+    .glow.b { top: 20%; right: -160px; width: 420px; height: 420px; background: #0891b2; animation: float2 16s ease-in-out infinite; }
+    @keyframes float1 { 50% { transform: translate(60px, 50px); } }
+    @keyframes float2 { 50% { transform: translate(-50px, 40px); } }
+
+    .container { max-width: 1040px; margin: 0 auto; padding: 28px 20px 60px; position: relative; z-index: 1; }
+
+    /* Topbar marca */
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; flex-wrap: wrap;
+      padding: 14px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      backdrop-filter: blur(12px);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-logo {
+      width: 42px; height: 42px; border-radius: 12px;
+      display: grid; place-items: center;
+      font-family: 'Sora', sans-serif; font-weight: 800; font-size: 1.2rem;
+      color: #fff;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      box-shadow: 0 8px 24px rgba(99,102,241,0.45);
+    }
+    .brand-name { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.05rem; letter-spacing: .3px; }
+    .brand-name b { background: linear-gradient(90deg, #a5b4fc, #67e8f9); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .brand-sub { font-size: .72rem; color: var(--txt-dim); letter-spacing: 1.5px; text-transform: uppercase; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: .78rem; color: var(--txt-dim);
+      padding: 8px 14px; border-radius: 999px;
+      border: 1px solid var(--border); background: rgba(0,0,0,0.25);
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 10px currentColor; }
+    .dot.on { background: var(--green); }
+
+    /* Hero */
+    .hero { text-align: center; padding: 48px 10px 30px; }
+    .hero .tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: .74rem; letter-spacing: 2px; text-transform: uppercase;
+      color: #a5b4fc; padding: 7px 16px; border-radius: 999px;
+      border: 1px solid var(--border-glow); background: rgba(99,102,241,0.08);
+      margin-bottom: 22px;
+    }
+    .hero h1 {
+      font-family: 'Sora', sans-serif; font-weight: 800;
+      font-size: clamp(1.9rem, 5vw, 3rem); line-height: 1.08; letter-spacing: -1px;
+    }
+    .hero h1 span { background: linear-gradient(90deg, #818cf8, #22d3ee); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero p { color: var(--txt-dim); max-width: 580px; margin: 18px auto 0; font-size: 1rem; line-height: 1.6; }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 26px;
+      margin: 18px 0;
+      backdrop-filter: blur(14px);
+      position: relative;
+      transition: border-color .3s, transform .3s;
+    }
+    .card:hover { border-color: var(--border-glow); }
+    .card h2 {
+      font-family: 'Sora', sans-serif; font-size: 1.1rem; font-weight: 700;
+      margin-bottom: 6px; display: flex; align-items: center; gap: 10px;
+    }
+    .card .card-desc { color: var(--txt-dim); font-size: .9rem; margin-bottom: 20px; }
+    .ico {
+      width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center;
+      background: linear-gradient(135deg, rgba(99,102,241,.25), rgba(6,182,212,.25));
+      border: 1px solid var(--border); font-size: 1rem;
+    }
+
+    /* QR */
+    #qr-area {
+      text-align: center; padding: 26px; min-height: 220px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.25); border: 1px dashed var(--border); border-radius: 14px;
+    }
+    #qr-area img { max-width: 260px; border-radius: 14px; padding: 12px; background: #fff; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+    #qr-area .msg { margin-top: 16px; font-size: .95rem; color: var(--txt-dim); }
+    .status-ok { color: var(--green) !important; font-weight: 600; }
+    .status-pendente { color: var(--amber) !important; }
+    .qr-loading { animation: pulse 1.6s ease-in-out infinite; }
+    @keyframes pulse { 50% { opacity: .45; } }
+
+    /* Botões */
+    .btn {
+      padding: 12px 22px; border: none; border-radius: 11px;
+      font-size: .92rem; font-weight: 600; cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: transform .15s, box-shadow .25s, opacity .2s;
+      display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn:active { transform: translateY(0); }
+    .btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+    .btn-primary { background: linear-gradient(135deg, var(--brand), var(--brand-2)); color: #fff; box-shadow: 0 10px 30px rgba(99,102,241,.4); }
+    .btn-success { background: linear-gradient(135deg, #16a34a, #22c55e); color: #fff; box-shadow: 0 10px 30px rgba(34,197,94,.35); }
+    .btn-ghost { background: var(--surface-2); color: var(--txt); border: 1px solid var(--border); }
+    .btn-amber { background: linear-gradient(135deg, #d97706, #f59e0b); color: #fff; }
+    .btn-red { background: linear-gradient(135deg, #b91c1c, #ef4444); color: #fff; }
+    .btn-small { padding: 9px 15px; font-size: .82rem; }
+
+    /* Tabs */
+    .tab-buttons { display: flex; gap: 8px; margin: 26px 0 18px; flex-wrap: wrap; }
+    .tab-btn {
+      padding: 11px 20px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 11px; color: var(--txt-dim); cursor: pointer; font-size: .9rem; font-weight: 600;
+      font-family: 'Inter', sans-serif; transition: all .2s;
+    }
+    .tab-btn.active { background: linear-gradient(135deg, var(--brand), var(--brand-2)); border-color: transparent; color: #fff; box-shadow: 0 8px 24px rgba(99,102,241,.4); }
+    .tab-btn:hover:not(.active) { color: var(--txt); border-color: var(--border-glow); }
+    .tab-content { display: none; animation: fade .35s ease; }
+    .tab-content.ativo { display: block; }
+    @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    /* Forms */
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; margin-bottom: 8px; font-size: .85rem; font-weight: 500; color: var(--txt); }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%; padding: 13px 16px; border: 1px solid var(--border); border-radius: 11px;
+      background: rgba(0,0,0,0.35); color: #fff; font-size: .95rem; font-family: 'Inter', sans-serif;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+      outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(99,102,241,.18);
+    }
+    .form-group select { cursor: pointer; }
+    .form-group textarea { min-height: 150px; resize: vertical; line-height: 1.6; }
+    .form-group input::placeholder, .form-group textarea::placeholder { color: #565b70; }
+
+    .checkbox-group { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; padding: 14px; background: rgba(0,0,0,.25); border: 1px solid var(--border); border-radius: 11px; }
+    .checkbox-group input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--brand); cursor: pointer; }
+    .checkbox-group label { font-size: .9rem; color: var(--txt-dim); cursor: pointer; }
+
+    .dica {
+      background: rgba(99,102,241,.1); border-left: 3px solid var(--brand);
+      padding: 14px 18px; border-radius: 0 11px 11px 0; margin: 0 0 20px; font-size: .9rem; line-height: 1.55; color: var(--txt-dim);
+    }
+    .dica b { color: var(--txt); }
+
+    /* Fluxos */
+    .flow-item { background: rgba(0,0,0,.28); border-radius: 13px; padding: 18px; margin-bottom: 14px; border: 1px solid var(--border); }
+    .flow-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .flow-header span { font-family: 'Sora', sans-serif; font-weight: 600; font-size: .9rem; color: #a5b4fc; }
+    .flow-item .flow-palavras { margin-bottom: 10px; }
+    .flow-item textarea { min-height: 90px; }
+
+    .key-link {
+      display: inline-flex; align-items: center; gap: 10px; margin-bottom: 16px;
+    }
+
+    /* Footer */
+    .footer { margin-top: 30px; text-align: center; color: var(--txt-dim); font-size: .82rem; }
+    .footer .credits { display: flex; flex-wrap: wrap; gap: 8px 14px; justify-content: center; align-items: center; margin-bottom: 14px; }
+    .footer a { color: #a5b4fc; text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+    .footer .sep { opacity: .35; }
+    .footer .contact-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 8px; }
+
+    @media (max-width: 600px) {
+      .hero { padding: 30px 6px 18px; }
+      .card { padding: 18px; }
+      .topbar { border-radius: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="glow a"></div>
+  <div class="glow b"></div>
+
+  <div class="container">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-logo">Q1</div>
+        <div>
+          <div class="brand-name"><b>Q1 Digital</b></div>
+          <div class="brand-sub">Inteligência Artificial &amp; Conversão</div>
+        </div>
+      </div>
+      <div class="pill"><span class="dot" id="statusDot"></span><span id="statusPill">Conectando…</span></div>
+    </div>
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="tag">⚡ Painel de Automação Inteligente</div>
+      <h1>Assistente de IA da <span>Q1 Digital</span></h1>
+      <p>Conecte o WhatsApp, ative a inteligência artificial e configure os fluxos de atendimento. Sua operação de conversão autônoma, em um só lugar.</p>
+    </div>
+
+    <!-- QR Code -->
+    <div class="card">
+      <h2><span class="ico">📲</span> Conectar WhatsApp</h2>
+      <p class="card-desc">Escaneie o QR Code com o app do WhatsApp em <b>Aparelhos conectados</b>. Na primeira conexão pode levar 1-2 minutos.</p>
+      <div id="qr-area">
+        <div class="msg status-pendente">Aguarde… o QR Code aparecerá aqui em instantes.</div>
+      </div>
+      <div id="qr-buttons" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:18px;">
+        <button class="btn btn-primary" id="btnGerarQR">Gerar novo QR Code</button>
+        <button class="btn btn-amber btn-small" id="btnLimparSessao">Limpar sessão e tentar</button>
+        <button class="btn btn-red btn-small" id="btnDesconectar" style="display:none;">Desconectar</button>
+      </div>
+      <p style="font-size:.78rem; color:var(--txt-dim); margin-top:12px; text-align:center;">Se o QR não aparecer ou não conectar, use "Limpar sessão e tentar".</p>
+    </div>
+
+    <!-- Abas -->
+    <div class="tab-buttons">
+      <button class="tab-btn active" data-tab="groq">🔑 Chave Groq (IA)</button>
+      <button class="tab-btn" data-tab="fluxos">📋 Fluxos do Bot</button>
+      <button class="tab-btn" data-tab="modelo">🧠 Modelo e Personalidade</button>
+    </div>
+
+    <!-- Aba Groq -->
+    <div id="tab-groq" class="tab-content ativo">
+      <div class="card">
+        <h2><span class="ico">🔑</span> Inteligência Artificial (Groq)</h2>
+        <p class="dica">
+          Os fluxos já respondem saudações e o menu. <b>Adicione sua chave Groq</b> para a IA responder qualquer pergunta fora dos fluxos com a linguagem da Q1 Digital.
+        </p>
+        <div class="key-link">
+          <a href="https://console.groq.com/keys" target="_blank" class="btn btn-success btn-small">🆓 Obter chave grátis no Groq</a>
+        </div>
+        <p style="font-size:.82rem; color:var(--txt-dim); margin-bottom:16px;">Crie a conta gratuita → API Keys → Create API Key → copie e cole abaixo.</p>
+        <div class="form-group">
+          <label>Sua chave Groq (gsk_…)</label>
+          <input type="password" id="groqKey" placeholder="Cole aqui a chave copiada do Groq">
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" id="useAI" checked>
+          <label for="useAI">Usar IA para responder perguntas que não estão nos fluxos</label>
+        </div>
+        <button class="btn btn-primary" id="salvarGroq">💾 Salvar configuração</button>
+      </div>
+    </div>
+
+    <!-- Aba Fluxos -->
+    <div id="tab-fluxos" class="tab-content">
+      <div class="card">
+        <h2><span class="ico">📋</span> Fluxos do Bot</h2>
+        <p class="dica">
+          Quando a pessoa digitar uma das <b>palavras-chave</b>, o bot responde com a mensagem definida. Separe as palavras por vírgula (ex: oi, olá, bom dia).
+        </p>
+        <div id="lista-fluxos"></div>
+        <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
+          <button class="btn btn-ghost" id="novoFluxo">+ Adicionar fluxo</button>
+          <button class="btn btn-primary" id="salvarFluxos">💾 Salvar fluxos</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aba Modelo -->
+    <div id="tab-modelo" class="tab-content">
+      <div class="card">
+        <h2><span class="ico">🧠</span> Personalidade da IA</h2>
+        <p class="dica">
+          Este texto define como a IA da <b>Q1 Digital</b> se comporta. Já vem pronto com o tom da marca — ajuste se quiser.
+        </p>
+        <div class="form-group">
+          <label>Instruções para a IA (prompt do sistema)</label>
+          <textarea id="promptSistema" placeholder="Ex: Você é o assistente virtual oficial da Q1 Digital..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Modelo de IA (Groq)</label>
+          <select id="modeloGroq">
+            <option value="llama-3.1-8b-instant">Llama 3.1 8B — rápido (recomendado)</option>
+            <option value="llama-3.3-70b-versatile">Llama 3.3 70B — mais inteligente</option>
+            <option value="openai/gpt-oss-120b">GPT-OSS 120B — alta capacidade</option>
+            <option value="mixtral-8x7b-32768">Mixtral 8x7B</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" id="salvarModelo">💾 Salvar</button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="card footer">
+      <div class="credits">
+        <span>Projeto desenvolvido para a <b style="color:#a5b4fc">Q1 Digital</b></span>
+        <span class="sep">•</span>
+        <span>por Marcio &amp; Sâmara</span>
+      </div>
+      <div class="contact-row">
+        <a href="https://wa.me/5548999744624" target="_blank" class="btn btn-success btn-small">💬 WhatsApp Q1</a>
+        <a href="mailto:contato@q1digital.com.br" class="btn btn-ghost btn-small">📧 contato@q1digital.com.br</a>
+        <a href="https://www.instagram.com/q1digitalfreela" target="_blank" class="btn btn-ghost btn-small">📸 Instagram</a>
+        <a href="https://q1digital.com.br" target="_blank" class="btn btn-ghost btn-small">🌐 q1digital.com.br</a>
+      </div>
+      <p style="margin-top:14px; opacity:.6;">© 2026 Q1 Digital · Engenharia de Conversão &amp; Automação</p>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const $ = id => document.getElementById(id);
+
+    function setStatusPill(conectado, texto) {
+      const dot = $('statusDot'), pill = $('statusPill');
+      if (conectado) { dot.classList.add('on'); pill.textContent = 'WhatsApp conectado'; }
+      else { dot.classList.remove('on'); pill.textContent = texto || 'Aguardando conexão'; }
+    }
+
+    // Tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('ativo'));
+        btn.classList.add('active');
+        $(`tab-${btn.dataset.tab}`).classList.add('ativo');
+      });
+    });
+
+    // QR e status
+    socket.on('qr', (qrDataUrl) => {
+      const area = $('qr-area');
+      const btnDesconectar = $('btnDesconectar');
+      if (qrDataUrl === 'loading') {
+        area.innerHTML = `<div class="msg status-pendente qr-loading">⏳ Gerando QR Code… aguarde 1-2 minutos.</div>`;
+        btnDesconectar.style.display = 'none';
+        if ($('btnLimparSessao')) $('btnLimparSessao').style.display = 'inline-flex';
+        setStatusPill(false, 'Gerando QR Code…');
+      } else if (qrDataUrl) {
+        area.innerHTML = `<img src="${qrDataUrl}" alt="QR Code"><div class="msg status-pendente">Escaneie com o WhatsApp (Aparelhos conectados)</div>`;
+        btnDesconectar.style.display = 'none';
+        if ($('btnLimparSessao')) $('btnLimparSessao').style.display = 'inline-flex';
+        setStatusPill(false, 'Escaneie o QR Code');
+      } else {
+        area.innerHTML = `<div class="msg status-ok">✅ WhatsApp conectado com sucesso!</div>`;
+        btnDesconectar.style.display = 'inline-flex';
+        if ($('btnLimparSessao')) $('btnLimparSessao').style.display = 'none';
+        setStatusPill(true);
+      }
+    });
+    socket.on('status', (s) => {
+      const area = $('qr-area');
+      const btnDesconectar = $('btnDesconectar');
+      if (s.conectado) {
+        area.innerHTML = `<div class="msg status-ok">✅ ${s.mensagem}</div>`;
+        btnDesconectar.style.display = 'inline-flex';
+        setStatusPill(true);
+      } else {
+        if (!area.querySelector('img')) {
+          area.innerHTML = `<div class="msg status-pendente">${s.mensagem}</div>`;
+        }
+        btnDesconectar.style.display = 'none';
+        setStatusPill(false, s.mensagem);
+      }
+      $('btnLimparSessao').style.display = s.conectado ? 'none' : 'inline-flex';
+    });
+
+    // Botões
+    $('btnGerarQR').addEventListener('click', async () => {
+      $('btnGerarQR').disabled = true; $('btnLimparSessao').disabled = true;
+      $('btnGerarQR').textContent = 'Gerando…';
+      try { await fetch('/api/whatsapp/restart', { method: 'POST' }); } catch (e) {}
+      setTimeout(() => {
+        $('btnGerarQR').disabled = false; $('btnLimparSessao').disabled = false;
+        $('btnGerarQR').textContent = 'Gerar novo QR Code';
+      }, 3000);
+    });
+    $('btnLimparSessao').addEventListener('click', async () => {
+      if (!confirm('Isso vai limpar a sessão do WhatsApp. Você precisará escanear o QR Code de novo. Continuar?')) return;
+      $('btnGerarQR').disabled = true; $('btnLimparSessao').disabled = true;
+      $('btnLimparSessao').textContent = 'Limpando…';
+      try { await fetch('/api/whatsapp/restart?limpar=1', { method: 'POST' }); } catch (e) {}
+      setTimeout(() => {
+        $('btnGerarQR').disabled = false; $('btnLimparSessao').disabled = false;
+        $('btnLimparSessao').textContent = 'Limpar sessão e tentar';
+      }, 3000);
+    });
+    $('btnDesconectar').addEventListener('click', async () => {
+      if (!confirm('Desconectar o WhatsApp?')) return;
+      $('btnDesconectar').disabled = true;
+      try { await fetch('/api/whatsapp/disconnect', { method: 'POST' }); } catch (e) {}
+      $('btnDesconectar').disabled = false; $('btnDesconectar').style.display = 'none';
+    });
+
+    // Carregar config
+    async function carregarConfig() {
+      const r = await fetch('/api/config/full');
+      const cfg = await r.json();
+      $('groqKey').value = cfg.groqApiKey || '';
+      $('useAI').checked = cfg.useAI !== false;
+      $('promptSistema').value = cfg.promptSistema || '';
+      $('modeloGroq').value = cfg.model || 'llama-3.1-8b-instant';
+      renderFluxos(cfg.flows || []);
+    }
+
+    function escapeHtml(s) {
+      const div = document.createElement('div');
+      div.textContent = s || '';
+      return div.innerHTML;
+    }
+    function renderFluxos(flows) {
+      const div = $('lista-fluxos');
+      div.innerHTML = flows.map((f, i) => {
+        const palavrasStr = (f.palavras || []).join(', ');
+        const respostaStr = f.resposta || '';
+        return `
+        <div class="flow-item" data-idx="${i}">
+          <div class="flow-header">
+            <span>⚡ Fluxo ${i + 1}</span>
+            <button class="btn btn-red btn-small" onclick="removerFluxo(${i})">Remover</button>
+          </div>
+          <div class="flow-palavras">
+            <input type="text" class="flow-palavras-input" placeholder="oi, olá, bom dia" value="${escapeHtml(palavrasStr)}">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <textarea class="flow-resposta-input" placeholder="Resposta do bot">${escapeHtml(respostaStr)}</textarea>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function coletarFluxos() {
+      const items = document.querySelectorAll('.flow-item');
+      return Array.from(items).map((el, i) => {
+        const palavrasRaw = el.querySelector('.flow-palavras-input')?.value || '';
+        const palavras = palavrasRaw.split(',').map(p => p.trim()).filter(Boolean);
+        const resposta = el.querySelector('.flow-resposta-input')?.value || '';
+        return { id: String(i + 1), palavras, resposta };
+      });
+    }
+
+    window.removerFluxo = function(i) {
+      const flows = coletarFluxos();
+      flows.splice(i, 1);
+      renderFluxos(flows);
+    };
+
+    $('novoFluxo').addEventListener('click', () => {
+      const flows = coletarFluxos();
+      flows.push({ id: String(flows.length + 1), palavras: [], resposta: '' });
+      renderFluxos(flows);
+    });
+
+    async function salvarTudo() {
+      const flows = coletarFluxos();
+      await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          groqApiKey: $('groqKey').value.trim(),
+          useAI: $('useAI').checked,
+          model: $('modeloGroq').value,
+          promptSistema: $('promptSistema').value.trim(),
+          flows
+        })
+      });
+      alert('✅ Configuração salva com sucesso!');
+    }
+
+    $('salvarGroq').addEventListener('click', salvarTudo);
+    $('salvarModelo').addEventListener('click', salvarTudo);
+    $('salvarFluxos').addEventListener('click', async () => {
+      const flows = coletarFluxos();
+      await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ flows })
+      });
+      alert('✅ Fluxos salvos!');
+    });
+
+    // Auto-salvar fluxos ao editar (debounce)
+    let debounceFluxo;
+    document.addEventListener('input', (e) => {
+      if (e.target.closest('.flow-item')) {
+        clearTimeout(debounceFluxo);
+        debounceFluxo = setTimeout(() => {
+          const flows = coletarFluxos();
+          fetch('/api/config', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ flows })
+          });
+        }, 1500);
+      }
+    });
+
+    carregarConfig();
+  </script>
+</body>
+</html>
